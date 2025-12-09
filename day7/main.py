@@ -1,3 +1,7 @@
+from collections import defaultdict
+import sys
+import copy
+
 def part1(matrix):
     counter = 0
     for r in range(1,len(matrix)):
@@ -13,8 +17,26 @@ def part1(matrix):
                     matrix[r][c] = "|"
     return counter
 
-def part2():
-    return
+
+def part2(matrix):
+    path_count = {}
+    for j, c in enumerate(matrix[0]):
+        if c == "S":
+            path_count[j] = 1
+            break
+    for i in range(len(matrix) - 1):
+        next_count = defaultdict(int)
+        for pos, count in path_count.items():
+            next_char = matrix[i+1][pos]
+            if next_char == "^":
+                next_count[pos-1] += count
+                next_count[pos+1] += count
+            else:
+                next_count[pos] += count
+        path_count = next_count
+    return sum(path_count.values())
+    
+    
 
 
 def read_file():
@@ -26,5 +48,6 @@ def read_file():
 
 
 matrix = read_file()
-print(f"Part1 answer: {part1(matrix)}")
+print(f"Part1 answer: {part1(copy.deepcopy(matrix))}")
+print(f"Part2 answer: {part2(copy.deepcopy(matrix))} ")
 
