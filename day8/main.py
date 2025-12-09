@@ -75,6 +75,70 @@ def part1(boxes, distances, limit):
     
     return result
 
+def part2(boxes, distances):
+    num_of_groups = len(boxes)
+    groups = []
+    membership = {}
+    
+    print(f"Total boxes: {len(boxes)}")
+    
+    for distance in distances:
+        if num_of_groups == 1:
+            break
+        
+        i, j = distance[1], distance[2]
+        last_box1 = []
+        last_box2 = []
+        
+        if i in membership and j in membership:
+            # Both are in groups
+            if membership[i] != membership[j]:
+                last_box1 = boxes[i]
+                last_box2 = boxes[j]
+                # Merge different groups
+                group_i = membership[i]
+                group_j = membership[j]
+                
+                print(f"  Merging group {group_j} into group {group_i}")
+                
+                # Merge group_j into group_i
+                for member in groups[group_j]:
+                    membership[member] = group_i
+                    groups[group_i].append(member)
+                
+                # Clear the old group
+                groups[group_j] = []
+                num_of_groups -= 1
+            else:
+                print(f"  Already in same group (group {membership[i]})")
+            
+        elif i in membership:
+            last_box1 = boxes[i]
+            last_box2 = boxes[j]
+            print(f"  Adding box {j} to group {membership[i]}")
+            membership[j] = membership[i]
+            groups[membership[i]].append(j)
+            num_of_groups -= 1
+            
+        elif j in membership:
+            last_box1 = boxes[i]
+            last_box2 = boxes[j]
+            print(f"  Adding box {i} to group {membership[j]}")
+            membership[i] = membership[j]
+            groups[membership[j]].append(i)
+            num_of_groups -= 1
+            
+        else:
+            last_box1 = boxes[i]
+            last_box2 = boxes[j]
+            print(f"  Creating new group {len(groups)}")
+            membership[i] = len(groups)
+            membership[j] = len(groups)
+            groups.append([i, j])
+            num_of_groups -= 1
+    print(last_box1, last_box2)
+    return last_box1[0]*last_box2[0]
+
 
 def read_file(filename):
     boxes = []
@@ -99,5 +163,5 @@ def calculate_distance(box1, box2):
 
 
 boxes, distances = read_file("data.txt")
-result = part1(boxes, distances, 1000)
-print(f"\nFinal Result: {result}")
+print(f"Part1 answer: {part1(boxes, distances, 1000)}")
+print(f"Part2 answer: {part2(boxes, distances)}")
